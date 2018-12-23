@@ -1,0 +1,7 @@
+[package]
+name = "golden_frieza"
+version = "0.1.0"
+authors = ["Giorgio Pomettini <giorgio.pomettini@gmail.com>"]
+
+[dependencies]
+csv = "1"
