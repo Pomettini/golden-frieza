@@ -95,3 +95,34 @@ fn test_process_document_colors_case_sensitive() {
 
     assert_eq!(colors.occurrences, result);
 }
+
+#[test]
+fn test_process_document_count_words() {
+    let mut colors: Color = Default::default();
+    let dictionary = Path::new("resources/test/colors.csv");
+    colors.load_dictionary(&dictionary);
+
+    let document = Document::from_text("freshness bold something hello".to_string());
+    colors.count_occurences(&document);
+
+    assert_eq!(colors.matches, 2);
+}
+
+#[test]
+fn test_process_document_calculate_percengages_first()
+{
+    let mut colors: Color = Default::default();
+    let dictionary = Path::new("resources/test/colors.csv");
+    colors.load_dictionary(&dictionary);
+
+    let document = Document::from_text("bold rich power freshness useless hello".to_string());
+    colors.count_occurences(&document);
+
+    let percentages = calculate_percentages(&colors.occurrences, colors.matches);
+
+    let mut result: HashMap<String, f32> = HashMap::new();
+    result.insert(String::from("Black"), 75.0);
+    result.insert(String::from("White"), 25.0);
+
+    assert_eq!(percentages, result);
+}

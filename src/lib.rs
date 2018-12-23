@@ -15,6 +15,7 @@ pub trait Element {
 pub struct Color {
     pub dictionary: HashMap<String, Vec<String>>,
     pub occurrences: HashMap<String, usize>,
+    pub matches: usize,
 }
 
 #[derive(Default)]
@@ -46,8 +47,6 @@ impl Element for Color {
         for result in dictionary.deserialize() {
             let record: (String, String) = result.unwrap();
 
-            println!("{:?}", &record);
-
             let color = record.0;
             let words: Vec<String> = Vec::from_iter(record.1.split(", ").map(String::from));
 
@@ -65,8 +64,10 @@ impl Element for Color {
                 let values = self.dictionary.get(key).unwrap();
 
                 for value in values {
-                    if value == word {
+                    // TODO: Fix it, extremely inefficent
+                    if value.to_lowercase() == word.to_lowercase() {
                         counter += 1;
+                        self.matches += 1;
                     }
                 }
             }
@@ -74,6 +75,20 @@ impl Element for Color {
             self.occurrences.insert(key.to_string(), counter);
         }
     }
+}
+
+pub fn calculate_percentages(
+    occurences: &HashMap<String, usize>,
+    matches: usize,
+) -> HashMap<String, f32> {
+    let mut result: HashMap<String, f32> = HashMap::new();
+
+    for (key, value) in occurences {
+        let percentage = (*value as f32 / matches as f32) * 100.0;
+        result.insert(key.to_string(), percentage);
+    }
+
+    result
 }
 
 #[cfg(test)]
