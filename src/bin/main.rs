@@ -1,10 +1,7 @@
 extern crate csv;
 extern crate golden_frieza;
 
-use csv::Reader;
 use golden_frieza::*;
-use std::collections::HashMap;
-use std::fs::File;
 use std::path::Path;
 
 fn main() {

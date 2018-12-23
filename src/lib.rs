@@ -1,8 +1,7 @@
 extern crate csv;
 
-use csv::{Reader, ReaderBuilder};
+use csv::{ReaderBuilder};
 use std::collections::HashMap;
-use std::fs::File;
 use std::iter::FromIterator;
 use std::path::Path;
 
@@ -55,13 +54,13 @@ impl Element for Color {
     }
 
     fn count_occurences(&mut self, document: &Document) {
-        let words: Vec<String> = Vec::from_iter(document.content.split(" ").map(String::from));
+        let words: Vec<String> = Vec::from_iter(document.content.split(' ').map(String::from));
 
         for key in self.dictionary.keys() {
             let mut counter: usize = 0;
 
             for word in &words {
-                let values = self.dictionary.get(key).unwrap();
+                let values = &self.dictionary[key];
 
                 for value in values {
                     // TODO: Fix it, extremely inefficent
