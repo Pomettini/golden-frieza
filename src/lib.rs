@@ -30,6 +30,10 @@ impl Document {
     pub fn from_path(path: &Path) {
         unimplemented!();
     }
+
+    pub fn from_website() {
+        unimplemented!();
+    }
 }
 
 impl Element for Color {
@@ -52,7 +56,22 @@ impl Element for Color {
     }
 
     fn count_occurences(&mut self, document: &Document) {
+        let words: Vec<String> = Vec::from_iter(document.content.split(" ").map(String::from));
 
+        for key in self.dictionary.keys() {
+            let mut counter: usize = 0;
+
+            for word in &words {
+                let values = self.dictionary.get(key).unwrap();
+                for value in values {
+                    if value == word {
+                        counter += 1;
+                    }
+                }
+            }
+
+            self.occurrences.insert(key.to_string(), counter);
+        }
     }
 }
 
