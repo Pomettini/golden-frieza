@@ -22,8 +22,6 @@ impl Element for Color {
             .from_path(path)
             .unwrap();
 
-        println!("{:?}", dictionary);
-
         for result in dictionary.deserialize() {
             let record: (String, String) = result.unwrap();
 
@@ -35,46 +33,4 @@ impl Element for Color {
             self.dictionary.insert(color, words);
         }
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_parse_csv_first() {
-        let mut colors: Color = Default::default();
-        let dictionary = Path::new("resources/test/colors.csv");
-        colors.load_dictionary(&dictionary);
-
-        let key: &Vec<String> = colors.dictionary.get("Black").unwrap();
-        let result: &Vec<String> = &vec![
-            String::from("Bold"),
-            String::from("Rich"),
-            String::from("Power"),
-        ];
-
-        assert_eq!(key, result);
-    }
-
-    #[test]
-    fn test_parse_csv_second() {
-        let mut colors: Color = Default::default();
-        let dictionary = Path::new("resources/test/colors.csv");
-        colors.load_dictionary(&dictionary);
-
-        let key: &Vec<String> = colors.dictionary.get("White").unwrap();
-        let result: &Vec<String> = &vec![
-            String::from("Freshness"),
-            String::from("Hope"),
-            String::from("Goodness"),
-        ];
-
-        assert_eq!(key, result);
-    }
-
-    // #[test]
-    // fn test_parse_colors() {
-    //     assert_eq!(2 + 2, 4);
-    // }
 }
