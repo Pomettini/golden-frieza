@@ -63,6 +63,7 @@ impl Element for Color {
 
             for word in &words {
                 let values = self.dictionary.get(key).unwrap();
+
                 for value in values {
                     if value == word {
                         counter += 1;
