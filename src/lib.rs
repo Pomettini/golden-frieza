@@ -8,11 +8,28 @@ use std::path::Path;
 
 pub trait Element {
     fn load_dictionary(&mut self, path: &Path);
+    fn count_occurences(&mut self, document: &Document);
 }
 
 #[derive(Default)]
 pub struct Color {
     pub dictionary: HashMap<String, Vec<String>>,
+    pub occurrences: HashMap<String, usize>,
+}
+
+#[derive(Default)]
+pub struct Document {
+    pub content: String,
+}
+
+impl Document {
+    pub fn from_text(text: String) -> Document {
+        Document { content: text }
+    }
+
+    pub fn from_path(path: &Path) {
+        unimplemented!();
+    }
 }
 
 impl Element for Color {
@@ -33,4 +50,11 @@ impl Element for Color {
             self.dictionary.insert(color, words);
         }
     }
+
+    fn count_occurences(&mut self, document: &Document) {
+
+    }
 }
+
+#[cfg(test)]
+mod tests;
