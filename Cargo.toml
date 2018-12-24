@@ -5,3 +5,4 @@ authors = ["Giorgio Pomettini <giorgio.pomettini@gmail.com>"]
 
 [dependencies]
 csv = "1"
+iui = "0.3"
