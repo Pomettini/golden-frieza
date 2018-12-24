@@ -1,11 +1,11 @@
 extern crate csv;
 
-use csv::{ReaderBuilder};
+use csv::ReaderBuilder;
 use std::collections::HashMap;
 use std::iter::FromIterator;
 use std::path::Path;
 
-// Build with CXXFLAGS+=-stdlib=libc++ cargo run
+// Build with CXXFLAGS=-stdlib=libc++ cargo run
 // TODO: Find the way to add this to the build script
 
 pub trait Element {

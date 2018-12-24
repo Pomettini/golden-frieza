@@ -1,8 +1,10 @@
 {
-	"folders": [
-		{
-			"path": "."
+	"folders": [{
+		"path": "."
+	}],
+	"settings": {
+		"rust.rustup": {
+			"toolchain": "stable-x86_64-apple-darwin"
 		}
-	],
-	"settings": {}
+	}
 }
