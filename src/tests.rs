@@ -126,3 +126,41 @@ fn test_process_document_calculate_percengages_first()
 
     assert_eq!(percentages, result);
 }
+
+#[test]
+fn test_process_document_calculate_percengages_empty()
+{
+    let mut colors: Color = Default::default();
+    let dictionary = Path::new("resources/test/colors.csv");
+    colors.load_dictionary(&dictionary);
+
+    let document = Document::from_text("".to_string());
+    colors.count_occurences(&document);
+
+    let percentages = calculate_percentages(&colors.occurrences, colors.matches);
+
+    let mut result: HashMap<String, f32> = HashMap::new();
+    result.insert(String::from("Black"), 0.0);
+    result.insert(String::from("White"), 0.0);
+
+    assert_eq!(percentages, result);
+}
+
+#[test]
+fn test_process_document_calculate_percengages_non_matching_words()
+{
+    let mut colors: Color = Default::default();
+    let dictionary = Path::new("resources/test/colors.csv");
+    colors.load_dictionary(&dictionary);
+
+    let document = Document::from_text("hello cat dog".to_string());
+    colors.count_occurences(&document);
+
+    let percentages = calculate_percentages(&colors.occurrences, colors.matches);
+
+    let mut result: HashMap<String, f32> = HashMap::new();
+    result.insert(String::from("Black"), 0.0);
+    result.insert(String::from("White"), 0.0);
+
+    assert_eq!(percentages, result);
+}

@@ -5,6 +5,9 @@ use std::collections::HashMap;
 use std::iter::FromIterator;
 use std::path::Path;
 
+// Build with CXXFLAGS+=-stdlib=libc++ cargo run
+// TODO: Find the way to add this to the build script
+
 pub trait Element {
     fn load_dictionary(&mut self, path: &Path);
     fn count_occurences(&mut self, document: &Document);
@@ -83,7 +86,8 @@ pub fn calculate_percentages(
     let mut result: HashMap<String, f32> = HashMap::new();
 
     for (key, value) in occurences {
-        let percentage = (*value as f32 / matches as f32) * 100.0;
+        // If result is NAN, will return 0
+        let percentage = f32::max(0.0, (*value as f32 / matches as f32) * 100.0);
         result.insert(key.to_string(), percentage);
     }
 
