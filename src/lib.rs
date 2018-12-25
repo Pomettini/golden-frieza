@@ -31,9 +31,7 @@ impl DisplayColors {
             dictionary.insert(record.0, rgb);
         }
 
-        DisplayColors {
-            dictionary
-        }
+        DisplayColors { dictionary }
     }
 
     pub fn blend_colors(&self, dictionary: HashMap<String, f32>) -> RGB {
@@ -98,7 +96,16 @@ impl Element for Color {
     }
 
     fn count_occurences(&mut self, document: &Document) {
-        let words: Vec<String> = Vec::from_iter(document.content.split(' ').map(String::from));
+        // Make a dictionary of all the words of the document
+        let words: Vec<String> = Vec::from_iter(
+            document
+                .content
+                .split([' ', ',', ';', '.', ':'].as_ref())
+                .map(String::from),
+        );
+
+        // Reset the matches counter
+        self.matches = 0;
 
         for key in self.dictionary.keys() {
             let mut counter: usize = 0;

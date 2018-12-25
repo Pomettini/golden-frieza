@@ -97,6 +97,22 @@ fn test_process_document_colors_case_sensitive() {
 }
 
 #[test]
+fn test_process_document_colors_case_ignore_puntuaction() {
+    let mut colors: Color = Default::default();
+    let dictionary = Path::new("resources/test/colors.csv");
+    colors.load_dictionary(&dictionary);
+
+    let document = Document::from_text("freshness, freshness; bold. bold: something,".to_string());
+    colors.count_occurences(&document);
+
+    let mut result: HashMap<String, usize> = HashMap::new();
+    result.insert(String::from("Black"), 2);
+    result.insert(String::from("White"), 2);
+
+    assert_eq!(colors.occurrences, result);
+}
+
+#[test]
 fn test_process_document_count_words() {
     let mut colors: Color = Default::default();
     let dictionary = Path::new("resources/test/colors.csv");
