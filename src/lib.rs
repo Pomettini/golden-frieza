@@ -1,5 +1,6 @@
 extern crate csv;
 
+use csv::Reader;
 use csv::ReaderBuilder;
 use std::collections::HashMap;
 use std::iter::FromIterator;
@@ -7,6 +8,46 @@ use std::path::Path;
 
 // Build with CXXFLAGS=-stdlib=libc++ cargo run
 // TODO: Find the way to add this to the build script
+
+type RGB = [f32; 3];
+
+#[derive(Default)]
+pub struct DisplayColors {
+    pub dictionary: HashMap<String, RGB>,
+}
+
+impl DisplayColors {
+    pub fn load_dictionary(path: &Path) -> DisplayColors {
+        let mut reader = Reader::from_path(path).unwrap();
+        let mut dictionary: HashMap<String, RGB> = HashMap::new();
+
+        for record in reader.deserialize() {
+            // TODO: Refactor, there has to be a better way to write this
+            let record: (String, f32, f32, f32) = record.unwrap();
+            let mut rgb: RGB = [0.0; 3];
+            rgb[0] = record.1;
+            rgb[1] = record.2;
+            rgb[2] = record.3;
+            dictionary.insert(record.0, rgb);
+        }
+
+        DisplayColors {
+            dictionary: dictionary,
+        }
+    }
+
+    pub fn blend_colors(&self, dictionary: HashMap<String, f32>) -> RGB {
+        let mut rgb: RGB = [0.0; 3];
+
+        for (key, value) in dictionary {
+            for i in 0..3 {
+                rgb[i] += (self.dictionary[&key][i] * value) / 100.0;
+            }
+        }
+
+        rgb
+    }
+}
 
 pub trait Element {
     fn load_dictionary(&mut self, path: &Path);

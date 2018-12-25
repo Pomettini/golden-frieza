@@ -109,8 +109,7 @@ fn test_process_document_count_words() {
 }
 
 #[test]
-fn test_process_document_calculate_percengages_first()
-{
+fn test_process_document_calculate_percengages_first() {
     let mut colors: Color = Default::default();
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
@@ -128,8 +127,7 @@ fn test_process_document_calculate_percengages_first()
 }
 
 #[test]
-fn test_process_document_calculate_percengages_empty()
-{
+fn test_process_document_calculate_percengages_empty() {
     let mut colors: Color = Default::default();
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
@@ -147,8 +145,7 @@ fn test_process_document_calculate_percengages_empty()
 }
 
 #[test]
-fn test_process_document_calculate_percengages_non_matching_words()
-{
+fn test_process_document_calculate_percengages_non_matching_words() {
     let mut colors: Color = Default::default();
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
@@ -163,4 +160,61 @@ fn test_process_document_calculate_percengages_non_matching_words()
     result.insert(String::from("White"), 0.0);
 
     assert_eq!(percentages, result);
+}
+
+#[test]
+fn test_load_display_colors() {
+    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+
+    let mut result: HashMap<String, RGB> = HashMap::new();
+    result.insert(String::from("Black"), [0.0, 0.0, 0.0]);
+    result.insert(String::from("White"), [255.0, 255.0, 255.0]);
+    result.insert(String::from("Red"), [255.0, 0.0, 0.0]);
+
+    assert_eq!(display_colors.dictionary, result);
+}
+
+#[test]
+fn test_load_display_blend_colors_first() {
+    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+
+    let mut input: HashMap<String, f32> = HashMap::new();
+    input.insert(String::from("Black"), 50.0);
+    input.insert(String::from("White"), 50.0);
+
+    let blend = display_colors.blend_colors(input);
+
+    let output: RGB = [127.5, 127.5, 127.5];
+
+    assert_eq!(blend, output);
+}
+
+#[test]
+fn test_load_display_blend_colors_second() {
+    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+
+    let mut input: HashMap<String, f32> = HashMap::new();
+    input.insert(String::from("Black"), 25.0);
+    input.insert(String::from("White"), 25.0);
+
+    let blend = display_colors.blend_colors(input);
+
+    let output: RGB = [63.75, 63.75, 63.75];
+
+    assert_eq!(blend, output);
+}
+
+#[test]
+fn test_load_display_blend_colors_third() {
+    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+
+    let mut input: HashMap<String, f32> = HashMap::new();
+    input.insert(String::from("White"), 25.0);
+    input.insert(String::from("Red"), 25.0);
+
+    let blend = display_colors.blend_colors(input);
+
+    let output: RGB = [127.5, 63.75, 63.75];
+
+    assert_eq!(blend, output);
 }
