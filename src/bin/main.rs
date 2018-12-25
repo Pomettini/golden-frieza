@@ -13,6 +13,12 @@ use std::collections::HashMap;
 use std::path::Path;
 use ui_sys::uiDrawContext;
 
+/* START TODO */
+// * Display color
+// * Load file
+// * Load website
+/* END TODO */
+
 fn main() {
     let mut colors: Color = Default::default();
     let dictionary = Path::new("resources/colors.csv");
