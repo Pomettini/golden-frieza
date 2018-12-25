@@ -32,7 +32,7 @@ impl DisplayColors {
         }
 
         DisplayColors {
-            dictionary: dictionary,
+            dictionary
         }
     }
 

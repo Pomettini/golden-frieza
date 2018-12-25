@@ -170,6 +170,7 @@ fn test_load_display_colors() {
     result.insert(String::from("Black"), [0.0, 0.0, 0.0]);
     result.insert(String::from("White"), [255.0, 255.0, 255.0]);
     result.insert(String::from("Red"), [255.0, 0.0, 0.0]);
+    result.insert(String::from("Blue"), [0.0, 0.0, 255.0]);
 
     assert_eq!(display_colors.dictionary, result);
 }
@@ -215,6 +216,22 @@ fn test_load_display_blend_colors_third() {
     let blend = display_colors.blend_colors(input);
 
     let output: RGB = [127.5, 63.75, 63.75];
+
+    assert_eq!(blend, output);
+}
+
+#[test]
+fn test_load_display_blend_colors_fourth() {
+    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+
+    let mut input: HashMap<String, f32> = HashMap::new();
+    input.insert(String::from("White"), 25.0);
+    input.insert(String::from("Red"), 25.0);
+    input.insert(String::from("Blue"), 50.0);
+
+    let blend = display_colors.blend_colors(input);
+
+    let output: RGB = [127.5, 63.75, 191.25];
 
     assert_eq!(blend, output);
 }
