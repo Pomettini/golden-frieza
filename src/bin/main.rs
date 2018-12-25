@@ -5,9 +5,7 @@ extern crate iui;
 use golden_frieza::*;
 use iui::controls::{Button, HorizontalBox, Label, MultilineEntry, VerticalBox};
 use iui::prelude::*;
-use std::error::Error;
-use std::fs::File;
-use std::io::prelude::*;
+use std::collections::HashMap;
 use std::path::Path;
 
 fn main() {
@@ -19,6 +17,9 @@ fn main() {
     let ui = UI::init().unwrap();
 
     let mut horizontal_box = HorizontalBox::new(&ui);
+
+    // Color text labels
+    let mut text_labels: HashMap<String, Label> = HashMap::new();
 
     // Create the input controls
     let mut input_vbox = VerticalBox::new(&ui);
@@ -39,17 +40,24 @@ fn main() {
     let mut output_vbox = VerticalBox::new(&ui);
     horizontal_box.append(&ui, output_vbox.clone(), LayoutStrategy::Stretchy);
 
+    // Insert GUI elements in a dictionary where Color is the key
+    for (key, _) in &colors.dictionary {
+        let mut label = Label::new(&ui, &format!("{}", key));
+        text_labels.insert(key.to_string(), label.clone());
+        output_vbox.append(&ui, label.clone(), LayoutStrategy::Compact);
+    }
+
     process_button.on_clicked(&ui, {
         let ui = ui.clone();
-        move |btn| {
+        move |_| {
             let document = Document::from_text(entry.value(&ui));
             colors.count_occurences(&document);
 
             let percentages = calculate_percentages(&colors.occurrences, colors.matches);
 
             for (key, value) in percentages {
-                let label = Label::new(&ui, &format!("{} is {}%", key, value));
-                output_vbox.append(&ui, label, LayoutStrategy::Compact);
+                let text = &format!("{} is {}%", key, value);
+                text_labels.get_mut(&key).unwrap().set_text(&ui, text);
             }
         }
     });
