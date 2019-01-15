@@ -1,7 +1,7 @@
 extern crate csv;
 extern crate golden_frieza;
 extern crate iui;
-extern crate ui_sys;
+// extern crate ui_sys;
 
 use golden_frieza::*;
 use iui::controls::{
@@ -11,7 +11,7 @@ use iui::draw::{Brush, DrawContext, FillMode, LineCap, LineJoin, SolidBrush, Str
 use iui::prelude::*;
 use std::collections::HashMap;
 use std::path::Path;
-use ui_sys::uiDrawContext;
+// use ui_sys::uiDrawContext;
 
 /* START TODO */
 // * Display color
