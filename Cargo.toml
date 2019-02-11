@@ -2,8 +2,7 @@
 name = "golden_frieza"
 version = "0.1.0"
 authors = ["Giorgio Pomettini <giorgio.pomettini@gmail.com>"]
-build = "build.rs"
 
 [dependencies]
 csv = "1"
-iui = { git = "https://github.com/barzamin/libui-rs.git", branch = "fix-macos-build" }
+iui = { git = "https://github.com/rust-native-ui/libui-rs.git" }

@@ -61,7 +61,7 @@ fn main() {
         output_vbox.append(&ui, label.clone(), LayoutStrategy::Compact);
     }
 
-    // output_vbox.append(&ui, HorizontalSeparator::new(&ui), LayoutStrategy::Compact);
+    // output_vbox.append(&ui, HorXizontalSeparator::new(&ui), LayoutStrategy::Compact);
 
     // Color labels
     let mut color_label = Label::new(&ui, "Color: 0 0 0");
