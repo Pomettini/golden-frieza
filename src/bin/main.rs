@@ -5,11 +5,14 @@ extern crate iui;
 
 use golden_frieza::*;
 use iui::controls::{
-    Button, HorizontalBox, HorizontalSeparator, Label, MultilineEntry, Spacer, VerticalBox,
+    Area, AreaDrawParams, AreaHandler, Button, HorizontalBox, HorizontalSeparator, Label,
+    LayoutStrategy, MultilineEntry, Spacer, VerticalBox,
 };
 use iui::draw::{Brush, DrawContext, FillMode, LineCap, LineJoin, SolidBrush, StrokeParams};
 use iui::prelude::*;
+use std::cell::RefCell;
 use std::collections::HashMap;
+use std::f64::consts::PI;
 use std::path::Path;
 // use ui_sys::uiDrawContext;
 
@@ -18,6 +21,24 @@ use std::path::Path;
 // * Load file
 // * Load website
 /* END TODO */
+
+struct HandleCanvas {
+    color: SolidBrush,
+}
+
+impl AreaHandler for HandleCanvas {
+    fn draw(&mut self, _area: &Area, draw_params: &AreaDrawParams) {
+        let ctx = &draw_params.context;
+
+        let path = iui::draw::Path::new(ctx, FillMode::Winding);
+        path.add_rectangle(ctx, 0., 0., draw_params.area_width, draw_params.area_height);
+        path.end(ctx);
+
+        let brush = Brush::Solid(self.color);
+
+        draw_params.context.fill(&path, &brush);
+    }
+}
 
 fn main() {
     let mut colors: Color = Default::default();
@@ -67,6 +88,19 @@ fn main() {
     let mut color_label = Label::new(&ui, "Color: 0 0 0");
     output_vbox.append(&ui, color_label.clone(), LayoutStrategy::Stretchy);
 
+    // Color area
+    let color_canvas = HandleCanvas {
+        color: SolidBrush {
+            r: 1.0,
+            g: 1.0,
+            b: 1.0,
+            a: 1.0,
+        },
+    };
+
+    let mut color_area = Area::new(&ui, Box::new(color_canvas));
+    output_vbox.append(&ui, color_area, LayoutStrategy::Stretchy);
+
     process_button.on_clicked(&ui, {
         let ui = ui.clone();
         move |_| {
@@ -86,30 +120,20 @@ fn main() {
                 &ui,
                 &format!("Color: {} {} {}", color[0], color[1], color[2]),
             );
+
+            let color_canvas = HandleCanvas {
+                color: SolidBrush {
+                    r: color[0] as f64 / 255.0,
+                    g: color[1] as f64 / 255.0,
+                    b: color[2] as f64 / 255.0,
+                    a: 1.0,
+                },
+            };
+
+            let mut color_area = Area::new(&ui, Box::new(color_canvas));
+            output_vbox.append(&ui, color_area, LayoutStrategy::Stretchy);
         }
     });
-
-    // unsafe {
-    //     let mut draw_ctx: uiDrawContext;
-    //     let draw_context = iui::draw::DrawContext::from_ui_draw_context(&mut draw_ctx);
-    //     let stroke = StrokeParams {
-    //         cap: LineCap::Flat,
-    //         join: LineJoin::Miter,
-    //         thickness: 1.0,
-    //         miter_limit: 1.0,
-    //         dashes: Vec::new(),
-    //         dash_phase: 1.0,
-    //     };
-    //     let brush = SolidBrush {
-    //         r: 255.0,
-    //         g: 0.0,
-    //         b: 0.0,
-    //         a: 0.0,
-    //     };
-
-    //     let draw_path = iui::draw::Path::new(&ui, FillMode::Winding);
-    //     draw_context.stroke(&ui, &draw_path, &Brush::Solid(brush), &stroke);
-    // }
 
     // Set up the application's layout
     let mut window = Window::new(&ui, "Golden Frieza", 640, 480, WindowType::NoMenubar);
