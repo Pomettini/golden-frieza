@@ -10,9 +10,7 @@ use iui::controls::{
 };
 use iui::draw::{Brush, DrawContext, FillMode, LineCap, LineJoin, SolidBrush, StrokeParams};
 use iui::prelude::*;
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::f64::consts::PI;
 use std::path::Path;
 // use ui_sys::uiDrawContext;
 
@@ -91,15 +89,24 @@ fn main() {
     // Color area
     let color_canvas = HandleCanvas {
         color: SolidBrush {
-            r: 1.0,
-            g: 1.0,
-            b: 1.0,
-            a: 1.0,
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+            a: 0.0,
         },
     };
 
-    let mut color_area = Area::new(&ui, Box::new(color_canvas));
-    output_vbox.append(&ui, color_area, LayoutStrategy::Stretchy);
+    // This is a way to update a color area
+    // It's a terrible, terrible hack, but it works
+
+    let mut temp_vboxes = Vec::new();
+
+    let mut temp_vbox = VerticalBox::new(&ui);
+    temp_vboxes.push(temp_vbox.clone());
+
+    let color_area = Area::new(&ui, Box::new(color_canvas));
+    temp_vbox.append(&ui, color_area, LayoutStrategy::Stretchy);
+    output_vbox.append(&ui, temp_vbox.clone(), LayoutStrategy::Stretchy);
 
     process_button.on_clicked(&ui, {
         let ui = ui.clone();
@@ -130,8 +137,18 @@ fn main() {
                 },
             };
 
-            let mut color_area = Area::new(&ui, Box::new(color_canvas));
-            output_vbox.append(&ui, color_area, LayoutStrategy::Stretchy);
+            // This is a way to update a color area
+            // It's a terrible, terrible hack, but it works
+
+            let mut t = temp_vboxes.pop().unwrap();
+            t.hide(&ui);
+
+            let mut temp_vbox = VerticalBox::new(&ui);
+            temp_vboxes.push(temp_vbox.clone());
+
+            let color_area = Area::new(&ui, Box::new(color_canvas));
+            temp_vbox.append(&ui, color_area, LayoutStrategy::Stretchy);
+            output_vbox.append(&ui, temp_vbox.clone(), LayoutStrategy::Stretchy);
         }
     });
 
