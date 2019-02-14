@@ -5,10 +5,10 @@ extern crate iui;
 
 use golden_frieza::*;
 use iui::controls::{
-    Area, AreaDrawParams, AreaHandler, Button, HorizontalBox, HorizontalSeparator, Label,
-    LayoutStrategy, MultilineEntry, Spacer, VerticalBox,
+    Area, AreaDrawParams, AreaHandler, Button, HorizontalBox, Label,
+    LayoutStrategy, MultilineEntry, VerticalBox,
 };
-use iui::draw::{Brush, DrawContext, FillMode, LineCap, LineJoin, SolidBrush, StrokeParams};
+use iui::draw::{Brush, FillMode, SolidBrush};
 use iui::prelude::*;
 use std::collections::HashMap;
 use std::path::Path;
@@ -80,8 +80,6 @@ fn main() {
         output_vbox.append(&ui, label.clone(), LayoutStrategy::Compact);
     }
 
-    // output_vbox.append(&ui, HorXizontalSeparator::new(&ui), LayoutStrategy::Compact);
-
     // Color labels
     let mut color_label = Label::new(&ui, "Color: 0 0 0");
     output_vbox.append(&ui, color_label.clone(), LayoutStrategy::Stretchy);
@@ -98,6 +96,7 @@ fn main() {
 
     // This is a way to update a color area
     // It's a terrible, terrible hack, but it works
+    // And it will leak memory :(
 
     let mut temp_vboxes = Vec::new();
 
@@ -130,15 +129,14 @@ fn main() {
 
             let color_canvas = HandleCanvas {
                 color: SolidBrush {
-                    r: color[0] as f64 / 255.0,
-                    g: color[1] as f64 / 255.0,
-                    b: color[2] as f64 / 255.0,
+                    r: f64::from(color[0]) / 255.0,
+                    g: f64::from(color[1]) / 255.0,
+                    b: f64::from(color[2]) / 255.0,
                     a: 1.0,
                 },
             };
 
-            // This is a way to update a color area
-            // It's a terrible, terrible hack, but it works
+            // TODO: Remove this terrible hack
 
             let mut t = temp_vboxes.pop().unwrap();
             t.hide(&ui);
