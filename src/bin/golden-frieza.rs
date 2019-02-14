@@ -116,7 +116,7 @@ fn main() {
             let percentages = calculate_percentages(&colors.occurrences, colors.matches);
 
             for (key, value) in percentages.clone() {
-                let text = &format!("{} is {}%", key, value);
+                let text = &format!("{} is {:.0}%", key, value);
                 text_labels.get_mut(&key).unwrap().set_text(&ui, text);
             }
 
@@ -124,7 +124,7 @@ fn main() {
 
             color_label.set_text(
                 &ui,
-                &format!("Color: {} {} {}", color[0], color[1], color[2]),
+                &format!("Color: {:.0} {:.0} {:.0}", color[0], color[1], color[2]),
             );
 
             let color_canvas = HandleCanvas {
