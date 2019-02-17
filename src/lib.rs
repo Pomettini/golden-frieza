@@ -1,8 +1,11 @@
 extern crate csv;
+extern crate reqwest;
 
 use csv::Reader;
 use csv::ReaderBuilder;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::prelude::*;
 use std::iter::FromIterator;
 use std::path::Path;
 
@@ -65,15 +68,27 @@ pub struct Document {
 }
 
 impl Document {
-    pub fn from_text(text: String) -> Document {
-        Document { content: text }
+    pub fn from_text(text: &String) -> Document {
+        Document {
+            content: text.to_string(),
+        }
     }
 
-    pub fn from_path(path: &Path) {
-        unimplemented!();
+    pub fn from_file(path: &Path) -> Document {
+        // TODO: Handle only text files
+
+        let mut file = File::open(&path).expect("File not found");
+        let mut contents = String::new();
+
+        file.read_to_string(&mut contents)
+            .expect("Cannot read the file");
+
+        Document { content: contents }
     }
 
     pub fn from_website() {
+        // TODO: Add reqwest request here
+
         unimplemented!();
     }
 }

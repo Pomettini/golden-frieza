@@ -5,19 +5,21 @@ extern crate iui;
 
 use golden_frieza::*;
 use iui::controls::{
-    Area, AreaDrawParams, AreaHandler, Button, HorizontalBox, Label,
-    LayoutStrategy, MultilineEntry, VerticalBox,
+    Area, AreaDrawParams, AreaHandler, Button, Entry, HorizontalBox, Label, LayoutStrategy,
+    MultilineEntry, VerticalBox,
 };
 use iui::draw::{Brush, FillMode, SolidBrush};
 use iui::prelude::*;
 use std::collections::HashMap;
+use std::env;
+use std::fs::File;
+use std::io::prelude::*;
 use std::path::Path;
-// use ui_sys::uiDrawContext;
 
 /* START TODO */
-// * Display color
 // * Load file
 // * Load website
+// * Support multiple languages
 /* END TODO */
 
 struct HandleCanvas {
@@ -51,18 +53,23 @@ fn main() {
 
     let mut horizontal_box = HorizontalBox::new(&ui);
 
+    // Initialize the window
+    let mut window = Window::new(&ui, "Golden Frieza", 640, 480, WindowType::NoMenubar);
+
     // Text labels
     let mut text_labels: HashMap<String, Label> = HashMap::new();
 
     // Create the input controls
     let mut input_vbox = VerticalBox::new(&ui);
-    let entry = MultilineEntry::new(&ui);
-    let load_file_button = Button::new(&ui, "Load File");
-    let load_website_button = Button::new(&ui, "Load Website");
+    let mut entry = MultilineEntry::new(&ui);
+    let mut load_file_button = Button::new(&ui, "Load File");
+    let mut load_website_button = Button::new(&ui, "Load Website");
+    let mut clear_textarea_buton = Button::new(&ui, "Clear Text Area");
     let mut process_button = Button::new(&ui, "Process Data");
 
     input_vbox.append(&ui, load_file_button.clone(), LayoutStrategy::Compact);
     input_vbox.append(&ui, load_website_button.clone(), LayoutStrategy::Compact);
+    input_vbox.append(&ui, clear_textarea_buton.clone(), LayoutStrategy::Compact);
     input_vbox.append(&ui, entry.clone(), LayoutStrategy::Stretchy);
     input_vbox.append(&ui, process_button.clone(), LayoutStrategy::Compact);
     input_vbox.set_padded(&ui, true);
@@ -107,10 +114,22 @@ fn main() {
     temp_vbox.append(&ui, color_area, LayoutStrategy::Stretchy);
     output_vbox.append(&ui, temp_vbox.clone(), LayoutStrategy::Stretchy);
 
+    window.set_child(&ui, horizontal_box);
+    window.show(&ui);
+
+    clear_textarea_buton.on_clicked(&ui, {
+        let ui = ui.clone();
+        let mut entry = entry.clone();
+        move |_| {
+            entry.set_value(&ui, "");
+        }
+    });
+
     process_button.on_clicked(&ui, {
         let ui = ui.clone();
+        let mut entry = entry.clone();
         move |_| {
-            let document = Document::from_text(entry.value(&ui));
+            let document = Document::from_text(&entry.value(&ui));
             colors.count_occurences(&document);
 
             let percentages = calculate_percentages(&colors.occurrences, colors.matches);
@@ -150,10 +169,35 @@ fn main() {
         }
     });
 
-    // Set up the application's layout
-    let mut window = Window::new(&ui, "Golden Frieza", 640, 480, WindowType::NoMenubar);
-    window.set_child(&ui, horizontal_box);
-    window.show(&ui);
+    load_file_button.on_clicked(&ui, {
+        let ui = ui.clone();
+        let mut entry = entry.clone();
+        move |_| {
+            let path = window.open_file(&ui);
+            let mut file = File::open(&path.unwrap()).expect("File not found");
+            let mut contents = String::new();
+
+            file.read_to_string(&mut contents)
+                .expect("Cannot read the file");
+
+            entry.set_value(&ui, &contents);
+        }
+    });
+
+    load_website_button.on_clicked(&ui, {
+        let ui = ui.clone();
+        move |_| {
+            let mut website_window =
+                Window::new(&ui, "Load website", 640, 60, WindowType::NoMenubar);
+            let mut website_entry = Entry::new(&ui);
+            let mut website_save_button = Button::new(&ui, "Save Buffer");
+            let mut website_vbox = VerticalBox::new(&ui);
+            website_vbox.append(&ui, website_entry.clone(), LayoutStrategy::Compact);
+            website_vbox.append(&ui, website_save_button.clone(), LayoutStrategy::Compact);
+            website_window.set_child(&ui, website_vbox);
+            website_window.show(&ui);
+        }
+    });
 
     ui.main();
 }

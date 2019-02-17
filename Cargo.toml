@@ -6,3 +6,4 @@ authors = ["Giorgio Pomettini <giorgio.pomettini@gmail.com>"]
 [dependencies]
 csv = "1"
 iui = { git = "https://github.com/rust-native-ui/libui-rs.git" }
+reqwest = "0.9.9"

@@ -1,4 +1,17 @@
 use super::*;
+use std::fs::File;
+use std::io::prelude::*;
+
+// TODO: Figure a way to use macros to init the color dictionary 
+// Instead of doing it manually
+
+macro_rules! init_color_dictionary {
+    () => {
+        let mut colors: Color = Default::default();
+        let dictionary = Path::new("resources/test/colors.csv");
+        colors.load_dictionary(&dictionary);
+    };
+}
 
 #[test]
 fn test_load_dictionary_first() {
@@ -38,7 +51,7 @@ fn test_process_document_colors_empty() {
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text("".to_string());
+    let document = Document::from_text(&"".to_string());
     colors.count_occurences(&document);
 
     let mut result: HashMap<String, usize> = HashMap::new();
@@ -54,7 +67,7 @@ fn test_process_document_colors_first() {
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text("Freshness Something Bold Something".to_string());
+    let document = Document::from_text(&"Freshness Something Bold Something".to_string());
     colors.count_occurences(&document);
 
     let mut result: HashMap<String, usize> = HashMap::new();
@@ -70,7 +83,7 @@ fn test_process_document_colors_second() {
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text("Freshness Hope Something Bold Rich Something".to_string());
+    let document = Document::from_text(&"Freshness Hope Something Bold Rich Something".to_string());
     colors.count_occurences(&document);
 
     let mut result: HashMap<String, usize> = HashMap::new();
@@ -86,7 +99,7 @@ fn test_process_document_colors_case_sensitive() {
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text("freshness bold something".to_string());
+    let document = Document::from_text(&"freshness bold something".to_string());
     colors.count_occurences(&document);
 
     let mut result: HashMap<String, usize> = HashMap::new();
@@ -102,7 +115,7 @@ fn test_process_document_colors_case_ignore_puntuaction() {
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text("freshness, freshness; bold. bold: something,".to_string());
+    let document = Document::from_text(&"freshness, freshness; bold. bold: something,".to_string());
     colors.count_occurences(&document);
 
     let mut result: HashMap<String, usize> = HashMap::new();
@@ -118,7 +131,7 @@ fn test_process_document_count_words() {
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text("freshness bold something hello".to_string());
+    let document = Document::from_text(&"freshness bold something hello".to_string());
     colors.count_occurences(&document);
 
     assert_eq!(colors.matches, 2);
@@ -130,7 +143,7 @@ fn test_process_document_calculate_percengages_first() {
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text("bold rich power freshness useless hello".to_string());
+    let document = Document::from_text(&"bold rich power freshness useless hello".to_string());
     colors.count_occurences(&document);
 
     let percentages = calculate_percentages(&colors.occurrences, colors.matches);
@@ -148,7 +161,7 @@ fn test_process_document_calculate_percengages_empty() {
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text("".to_string());
+    let document = Document::from_text(&"".to_string());
     colors.count_occurences(&document);
 
     let percentages = calculate_percentages(&colors.occurrences, colors.matches);
@@ -166,7 +179,7 @@ fn test_process_document_calculate_percengages_non_matching_words() {
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text("hello cat dog".to_string());
+    let document = Document::from_text(&"hello cat dog".to_string());
     colors.count_occurences(&document);
 
     let percentages = calculate_percentages(&colors.occurrences, colors.matches);
@@ -180,7 +193,8 @@ fn test_process_document_calculate_percengages_non_matching_words() {
 
 #[test]
 fn test_load_display_colors() {
-    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+    let display_colors =
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
 
     let mut result: HashMap<String, RGB> = HashMap::new();
     result.insert(String::from("Black"), [0.0, 0.0, 0.0]);
@@ -193,7 +207,8 @@ fn test_load_display_colors() {
 
 #[test]
 fn test_load_display_blend_colors_first() {
-    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+    let display_colors =
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
 
     let mut input: HashMap<String, f32> = HashMap::new();
     input.insert(String::from("Black"), 50.0);
@@ -208,7 +223,8 @@ fn test_load_display_blend_colors_first() {
 
 #[test]
 fn test_load_display_blend_colors_second() {
-    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+    let display_colors =
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
 
     let mut input: HashMap<String, f32> = HashMap::new();
     input.insert(String::from("Black"), 25.0);
@@ -223,7 +239,8 @@ fn test_load_display_blend_colors_second() {
 
 #[test]
 fn test_load_display_blend_colors_third() {
-    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+    let display_colors =
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
 
     let mut input: HashMap<String, f32> = HashMap::new();
     input.insert(String::from("White"), 25.0);
@@ -238,7 +255,8 @@ fn test_load_display_blend_colors_third() {
 
 #[test]
 fn test_load_display_blend_colors_fourth() {
-    let display_colors = DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+    let display_colors =
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
 
     let mut input: HashMap<String, f32> = HashMap::new();
     input.insert(String::from("White"), 25.0);
@@ -250,4 +268,43 @@ fn test_load_display_blend_colors_fourth() {
     let output: RGB = [127.5, 63.75, 191.25];
 
     assert_eq!(blend, output);
+}
+
+#[test]
+fn test_load_file() {
+    // let mut colors: Color = Default::default();
+    // let dictionary = Path::new("resources/test/colors.csv");
+    // colors.load_dictionary(&dictionary);
+
+    // let path = Path::new("resources/test/sample_text.txt");
+    // let mut file = File::open(&path).expect("File not found");
+    // let mut contents = String::new();
+
+    // file.read_to_string(&mut contents)
+    //     .expect("Cannot read the file");
+
+    // let document = Document::from_text(&"".to_string());
+    // colors.count_occurences(&document);
+
+    // let mut result: HashMap<String, usize> = HashMap::new();
+    // result.insert(String::from("Black"), 0);
+    // result.insert(String::from("White"), 0);
+
+    // assert_eq!(colors.occurrences, result);
+}
+
+#[test]
+fn test_process_file() {
+    let mut colors: Color = Default::default();
+    let dictionary = Path::new("resources/test/colors.csv");
+    colors.load_dictionary(&dictionary);
+
+    let document = Document::from_text(&"freshness bold something".to_string());
+    colors.count_occurences(&document);
+
+    let mut result: HashMap<String, usize> = HashMap::new();
+    result.insert(String::from("Black"), 1);
+    result.insert(String::from("White"), 1);
+
+    assert_eq!(colors.occurrences, result);
 }
