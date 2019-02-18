@@ -1,9 +1,13 @@
+extern crate ammonia;
 extern crate csv;
+extern crate regex;
 extern crate reqwest;
 
+use ammonia::Builder;
 use csv::Reader;
 use csv::ReaderBuilder;
-use std::collections::HashMap;
+use regex::Regex;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::prelude::*;
 use std::iter::FromIterator;
@@ -86,10 +90,39 @@ impl Document {
         Document { content: contents }
     }
 
-    pub fn from_website() {
-        // TODO: Add reqwest request here
+    pub fn from_website(url: &str) -> Document {
+        // TODO: Handle errors and exceptions
 
-        unimplemented!();
+        let mut request = reqwest::get(url).unwrap();
+        let page_content = request.text().unwrap();
+
+        #[cfg_attr(rustfmt, rustfmt_skip)]
+        let tags: HashSet<_> = [
+            "a", "abbr", "acronym", "area", "article", "aside", "b", "bdi",
+            "bdo", "blockquote", "br", "caption", "center", "cite", "code",
+            "col", "colgroup", "data", "dd", "del", "details", "dfn", "div",
+            "dl", "dt", "em", "figcaption", "figure", "footer", "h1", "h2",
+            "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "i", "img",
+            "ins", "kbd", "kbd", "li", "map", "mark", "nav", "ol", "p", "pre",
+            "q", "rp", "rt", "rtc", "ruby", "s", "samp", "small", "span",
+            "strike", "strong", "sub", "summary", "sup", "table", "tbody",
+            "td", "th", "thead", "time", "tr", "tt", "u", "ul", "var", "wbr"
+        ].iter().collect();
+
+        let clean_text = Builder::new()
+            .rm_tags(tags)
+            .clean(&page_content)
+            .to_string();
+
+        // Remove newlines ecc
+        let re = Regex::new(r"\n|\r|\t").unwrap();
+        let clean_text = re.replace_all(&clean_text, "").to_string();
+
+        println!("RESULT: {:?}", &clean_text);
+
+        Document {
+            content: clean_text,
+        }
     }
 }
 

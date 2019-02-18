@@ -2,7 +2,7 @@ use super::*;
 use std::fs::File;
 use std::io::prelude::*;
 
-// TODO: Figure a way to use macros to init the color dictionary 
+// TODO: Figure a way to use macros to init the color dictionary
 // Instead of doing it manually
 
 macro_rules! init_color_dictionary {
@@ -271,35 +271,28 @@ fn test_load_display_blend_colors_fourth() {
 }
 
 #[test]
-fn test_load_file() {
-    // let mut colors: Color = Default::default();
-    // let dictionary = Path::new("resources/test/colors.csv");
-    // colors.load_dictionary(&dictionary);
-
-    // let path = Path::new("resources/test/sample_text.txt");
-    // let mut file = File::open(&path).expect("File not found");
-    // let mut contents = String::new();
-
-    // file.read_to_string(&mut contents)
-    //     .expect("Cannot read the file");
-
-    // let document = Document::from_text(&"".to_string());
-    // colors.count_occurences(&document);
-
-    // let mut result: HashMap<String, usize> = HashMap::new();
-    // result.insert(String::from("Black"), 0);
-    // result.insert(String::from("White"), 0);
-
-    // assert_eq!(colors.occurrences, result);
-}
-
-#[test]
 fn test_process_file() {
     let mut colors: Color = Default::default();
     let dictionary = Path::new("resources/test/colors.csv");
     colors.load_dictionary(&dictionary);
 
-    let document = Document::from_text(&"freshness bold something".to_string());
+    let document = Document::from_file((Path::new("resources/test/sample_file.txt")));
+    colors.count_occurences(&document);
+
+    let mut result: HashMap<String, usize> = HashMap::new();
+    result.insert(String::from("Black"), 1);
+    result.insert(String::from("White"), 1);
+
+    assert_eq!(colors.occurrences, result);
+}
+
+#[test]
+fn test_process_website() {
+    let mut colors: Color = Default::default();
+    let dictionary = Path::new("resources/test/colors.csv");
+    colors.load_dictionary(&dictionary);
+
+    let document = Document::from_website("https://www.giorgiopomettini.eu/test/sample_webpage.html");
     colors.count_occurences(&document);
 
     let mut result: HashMap<String, usize> = HashMap::new();

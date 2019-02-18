@@ -6,7 +6,7 @@ extern crate iui;
 use golden_frieza::*;
 use iui::controls::{
     Area, AreaDrawParams, AreaHandler, Button, Entry, HorizontalBox, Label, LayoutStrategy,
-    MultilineEntry, VerticalBox,
+    MultilineEntry, ProgressBar, ProgressBarValue, VerticalBox,
 };
 use iui::draw::{Brush, FillMode, SolidBrush};
 use iui::prelude::*;
@@ -56,8 +56,9 @@ fn main() {
     // Initialize the window
     let mut window = Window::new(&ui, "Golden Frieza", 640, 480, WindowType::NoMenubar);
 
-    // Text labels
+    // Text labels and bars
     let mut text_labels: HashMap<String, Label> = HashMap::new();
+    let mut text_bars: HashMap<String, ProgressBar> = HashMap::new();
 
     // Create the input controls
     let mut input_vbox = VerticalBox::new(&ui);
@@ -67,6 +68,7 @@ fn main() {
     let mut clear_textarea_buton = Button::new(&ui, "Clear Text Area");
     let mut process_button = Button::new(&ui, "Process Data");
 
+    // Add to the input panel
     input_vbox.append(&ui, load_file_button.clone(), LayoutStrategy::Compact);
     input_vbox.append(&ui, load_website_button.clone(), LayoutStrategy::Compact);
     input_vbox.append(&ui, clear_textarea_buton.clone(), LayoutStrategy::Compact);
@@ -85,6 +87,10 @@ fn main() {
         let mut label = Label::new(&ui, &format!("{} is 0%", key));
         text_labels.insert(key.to_string(), label.clone());
         output_vbox.append(&ui, label.clone(), LayoutStrategy::Compact);
+
+        let mut text_bar = ProgressBar::new();
+        text_bars.insert(key.to_string(), text_bar.clone());
+        output_vbox.append(&ui, text_bar.clone(), LayoutStrategy::Compact);
     }
 
     // Color labels
@@ -137,6 +143,10 @@ fn main() {
             for (key, value) in percentages.clone() {
                 let text = &format!("{} is {:.0}%", key, value);
                 text_labels.get_mut(&key).unwrap().set_text(&ui, text);
+                text_bars
+                    .get_mut(&key)
+                    .unwrap()
+                    .set_value(ProgressBarValue::Determinate(value as u32));
             }
 
             let color = display_colors.blend_colors(percentages);
@@ -164,8 +174,8 @@ fn main() {
             temp_vboxes.push(temp_vbox.clone());
 
             let color_area = Area::new(&ui, Box::new(color_canvas));
-            temp_vbox.append(&ui, color_area, LayoutStrategy::Stretchy);
-            output_vbox.append(&ui, temp_vbox.clone(), LayoutStrategy::Stretchy);
+            temp_vbox.append(&ui, color_area, LayoutStrategy::Compact);
+            output_vbox.append(&ui, temp_vbox.clone(), LayoutStrategy::Compact);
         }
     });
 
@@ -173,6 +183,8 @@ fn main() {
         let ui = ui.clone();
         let mut entry = entry.clone();
         move |_| {
+            // TODO: Use document from_file method instead
+
             let path = window.open_file(&ui);
             let mut file = File::open(&path.unwrap()).expect("File not found");
             let mut contents = String::new();
@@ -187,15 +199,17 @@ fn main() {
     load_website_button.on_clicked(&ui, {
         let ui = ui.clone();
         move |_| {
-            let mut website_window =
-                Window::new(&ui, "Load website", 640, 60, WindowType::NoMenubar);
-            let mut website_entry = Entry::new(&ui);
-            let mut website_save_button = Button::new(&ui, "Save Buffer");
-            let mut website_vbox = VerticalBox::new(&ui);
-            website_vbox.append(&ui, website_entry.clone(), LayoutStrategy::Compact);
-            website_vbox.append(&ui, website_save_button.clone(), LayoutStrategy::Compact);
-            website_window.set_child(&ui, website_vbox);
-            website_window.show(&ui);
+            // let mut website_window =
+            //     Window::new(&ui, "Load website", 640, 60, WindowType::NoMenubar);
+            // let mut website_entry = Entry::new(&ui);
+            // let mut website_save_button = Button::new(&ui, "Save Buffer");
+            // let mut website_vbox = VerticalBox::new(&ui);
+            // website_vbox.append(&ui, website_entry.clone(), LayoutStrategy::Compact);
+            // website_vbox.append(&ui, website_save_button.clone(), LayoutStrategy::Compact);
+            // website_window.set_child(&ui, website_vbox);
+            // website_window.show(&ui);
+
+            let document = Document::from_website("http://example.org/");
         }
     });
 
