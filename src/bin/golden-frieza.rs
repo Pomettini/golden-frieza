@@ -156,7 +156,7 @@ fn main() {
         let display_colors = display_colors.clone();
         let color_label = color_label.clone();
         let temp_vboxes = temp_vboxes.clone();
-        let output_vbox = output_vbox.clone();
+        let mut output_vbox = output_vbox.clone();
         move |_| {
             let document = Document::from_text(&entry.value(&ui));
             colors.borrow_mut().count_occurences(&document);
