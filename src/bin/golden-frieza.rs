@@ -223,7 +223,7 @@ macro_rules! refresh_content {
                 .borrow_mut()
                 .get_mut(&key)
                 .unwrap()
-                .set_value(ProgressBarValue::Determinate(value as u32));
+                .set_value(&$ui, ProgressBarValue::Determinate(value as u32));
         }
 
         let color = $display_colors.borrow().blend_colors(percentages);
