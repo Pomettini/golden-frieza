@@ -1,23 +1,16 @@
 use super::*;
-use std::fs::File;
-use std::io::prelude::*;
 
-// TODO: Figure a way to use macros to init the color dictionary
-// Instead of doing it manually
-
-macro_rules! init_color_dictionary {
-    () => {
-        let mut colors: Color = Default::default();
-        let dictionary = Path::new("resources/test/colors.csv");
-        colors.load_dictionary(&dictionary);
+macro_rules! INIT_COLOR_DICTIONARY {
+    ($colors:ident, $dictionary:ident) => {
+        let mut $colors: Color = Default::default();
+        let $dictionary = Path::new("resources/test/colors.csv");
+        $colors.load_dictionary(&$dictionary);
     };
 }
 
 #[test]
 fn test_load_dictionary_first() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let key: &Vec<String> = colors.dictionary.get("Black").unwrap();
     let result: &Vec<String> = &vec![
@@ -31,9 +24,7 @@ fn test_load_dictionary_first() {
 
 #[test]
 fn test_load_dictionary_second() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let key: &Vec<String> = colors.dictionary.get("White").unwrap();
     let result: &Vec<String> = &vec![
@@ -47,9 +38,7 @@ fn test_load_dictionary_second() {
 
 #[test]
 fn test_process_document_colors_empty() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_text(&"".to_string());
     colors.count_occurences(&document);
@@ -63,9 +52,7 @@ fn test_process_document_colors_empty() {
 
 #[test]
 fn test_process_document_colors_first() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_text(&"Freshness Something Bold Something".to_string());
     colors.count_occurences(&document);
@@ -79,9 +66,7 @@ fn test_process_document_colors_first() {
 
 #[test]
 fn test_process_document_colors_second() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_text(&"Freshness Hope Something Bold Rich Something".to_string());
     colors.count_occurences(&document);
@@ -95,9 +80,7 @@ fn test_process_document_colors_second() {
 
 #[test]
 fn test_process_document_colors_case_sensitive() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_text(&"freshness bold something".to_string());
     colors.count_occurences(&document);
@@ -111,9 +94,7 @@ fn test_process_document_colors_case_sensitive() {
 
 #[test]
 fn test_process_document_colors_case_ignore_puntuaction() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_text(&"freshness, freshness; bold. bold: something,".to_string());
     colors.count_occurences(&document);
@@ -127,9 +108,7 @@ fn test_process_document_colors_case_ignore_puntuaction() {
 
 #[test]
 fn test_process_document_count_words() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_text(&"freshness bold something hello".to_string());
     colors.count_occurences(&document);
@@ -139,9 +118,7 @@ fn test_process_document_count_words() {
 
 #[test]
 fn test_process_document_calculate_percengages_first() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_text(&"bold rich power freshness useless hello".to_string());
     colors.count_occurences(&document);
@@ -157,9 +134,7 @@ fn test_process_document_calculate_percengages_first() {
 
 #[test]
 fn test_process_document_calculate_percengages_empty() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_text(&"".to_string());
     colors.count_occurences(&document);
@@ -175,9 +150,7 @@ fn test_process_document_calculate_percengages_empty() {
 
 #[test]
 fn test_process_document_calculate_percengages_non_matching_words() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_text(&"hello cat dog".to_string());
     colors.count_occurences(&document);
@@ -272,11 +245,9 @@ fn test_load_display_blend_colors_fourth() {
 
 #[test]
 fn test_process_file() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
-    let document = Document::from_file((Path::new("resources/test/sample_file.txt")));
+    let document = Document::from_file(Path::new("resources/test/sample_file.txt"));
     colors.count_occurences(&document);
 
     let mut result: HashMap<String, usize> = HashMap::new();
@@ -288,11 +259,10 @@ fn test_process_file() {
 
 #[test]
 fn test_process_website() {
-    let mut colors: Color = Default::default();
-    let dictionary = Path::new("resources/test/colors.csv");
-    colors.load_dictionary(&dictionary);
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
 
-    let document = Document::from_website("https://www.giorgiopomettini.eu/test/sample_webpage.html");
+    let document =
+        Document::from_website("https://www.giorgiopomettini.eu/test/sample_webpage.html");
     colors.count_occurences(&document);
 
     let mut result: HashMap<String, usize> = HashMap::new();

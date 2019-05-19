@@ -18,11 +18,9 @@ use std::io::prelude::*;
 use std::path::Path;
 use std::rc::Rc;
 
-/* START TODO */
-// * Load file
-// * Load website
-// * Support multiple languages
-/* END TODO */
+// TODO: Load file
+// TODO: Load website
+// TODO: Support multiple languages
 
 struct HandleCanvas {
     color: SolidBrush,
