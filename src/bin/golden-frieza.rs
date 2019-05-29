@@ -50,7 +50,7 @@ fn main() {
     ));
 
     // Initialize the UI
-    let ui = UI::init().unwrap();
+    let ui = UI::init().expect("Cannot initialize the UI");
 
     let mut horizontal_box = HorizontalBox::new(&ui);
 

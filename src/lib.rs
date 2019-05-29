@@ -93,8 +93,8 @@ impl Document {
     pub fn from_website(url: &str) -> Document {
         // TODO: Handle errors and exceptions
 
-        let mut request = reqwest::get(url).unwrap();
-        let page_content = request.text().unwrap();
+        let mut request = reqwest::get(url).expect("URL not valid");
+        let page_content = request.text().expect("Cannot parse page content");
 
         #[cfg_attr(rustfmt, rustfmt_skip)]
         let tags: HashSet<_> = [
@@ -115,7 +115,7 @@ impl Document {
             .to_string();
 
         // Remove newlines ecc
-        let re = Regex::new(r"\n|\r|\t").unwrap();
+        let re = Regex::new(r"\n|\r|\t").expect("Invalid regex");
         let clean_text = re.replace_all(&clean_text, "").to_string();
 
         println!("RESULT: {:?}", &clean_text);
@@ -131,10 +131,10 @@ impl Element for Color {
         let mut dictionary = ReaderBuilder::new()
             .delimiter(b';')
             .from_path(path)
-            .unwrap();
+            .expect("Cannot build the dictionary");
 
         for result in dictionary.deserialize() {
-            let record: (String, String) = result.unwrap();
+            let record: (String, String) = result.expect("Cannot deserialize the dictionary");
 
             let color = record.0;
             let words: Vec<String> = Vec::from_iter(record.1.split(", ").map(String::from));
