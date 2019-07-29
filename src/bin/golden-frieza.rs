@@ -1,7 +1,7 @@
+extern crate color_convert;
 extern crate csv;
 extern crate golden_frieza;
 extern crate iui;
-// extern crate ui_sys;
 
 use golden_frieza::*;
 use iui::controls::{
@@ -105,7 +105,7 @@ fn main() {
     }
 
     // Color labels
-    let color_label = Label::new(&ui, "Color: 0 0 0");
+    let color_label = Label::new(&ui, "RGB: 0, 0, 0 - Hex: #000000");
     output_vbox.append(&ui, color_label.clone(), LayoutStrategy::Stretchy);
 
     output_vbox.append(&ui, HorizontalSeparator::new(&ui), LayoutStrategy::Stretchy);
@@ -173,11 +173,20 @@ fn main() {
 
     load_file_button.on_clicked(&ui, {
         let ui = ui.clone();
-        // let entry = entry.clone();
+        let window = window.clone();
+        let mut entry = entry.clone();
         let colors = colors.clone();
         move |_| {
-            let path = window.open_file(&ui).expect("File not found");
+            let path = window.open_file(&ui);
+            if path == None {
+                window.modal_err(&ui, "Warning", "Please enter a valid file");
+                return;
+            }
+
+            let path = path.unwrap();
+
             let document = Document::from_file(&path);
+            entry.set_value(&ui, &document.content);
             colors.borrow_mut().count_occurences(&document);
 
             refresh_content!(
@@ -224,10 +233,21 @@ macro_rules! refresh_content {
         }
 
         let color = $display_colors.borrow().blend_colors(percentages);
+        let hex = color_convert::color::Color::init(
+            &format!("rgb({:.0}, {:.0}, {:.0})", color[0], color[1], color[2]),
+            false,
+            false,
+            false,
+        )
+        .to_hex()
+        .unwrap_or("#000000".to_string());
 
         $color_label.clone().set_text(
             &$ui,
-            &format!("Color: {:.0} {:.0} {:.0}", color[0], color[1], color[2]),
+            &format!(
+                "RGB: {:.0}, {:.0}, {:.0} - HEX: {}",
+                color[0], color[1], color[2], hex
+            ),
         );
 
         let color_canvas = HandleCanvas {
