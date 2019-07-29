@@ -248,7 +248,8 @@ fn test_process_file() {
     INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_file(Path::new("resources/test/sample_file.txt"));
-    colors.count_occurences(&document);
+    // TODO: Check if file is valid
+    colors.count_occurences(&document.unwrap());
 
     let mut result: HashMap<String, usize> = HashMap::new();
     result.insert(String::from("Black"), 1);

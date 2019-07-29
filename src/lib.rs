@@ -66,7 +66,7 @@ pub struct Color {
     pub matches: usize,
 }
 
-#[derive(Default)]
+#[derive(Default, PartialEq)]
 pub struct Document {
     pub content: String,
 }
@@ -78,16 +78,16 @@ impl Document {
         }
     }
 
-    pub fn from_file(path: &Path) -> Document {
+    pub fn from_file(path: &Path) -> Option<Document> {
         // TODO: Handle only text files
 
         let mut file = File::open(&path).expect("File not found");
         let mut contents = String::new();
 
-        file.read_to_string(&mut contents)
-            .expect("Cannot read the file");
-
-        Document { content: contents }
+        match file.read_to_string(&mut contents) {
+            Ok(_) => return Some(Document { content: contents }),
+            Err(_) => return None,
+        }
     }
 
     pub fn from_website(url: &str) -> Document {

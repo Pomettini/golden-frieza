@@ -67,7 +67,7 @@ fn main() {
     let mut load_file_button = Button::new(&ui, "Load File");
     let website_entry = Entry::new(&ui);
     let mut load_website_button = Button::new(&ui, "Load Website");
-    let mut clear_textarea_buton = Button::new(&ui, "Clear Text Area");
+    let mut clear_textarea_button = Button::new(&ui, "Clear Text Area");
     let mut process_button = Button::new(&ui, "Process Data");
 
     let mut website_hbox = HorizontalBox::new(&ui);
@@ -76,9 +76,9 @@ fn main() {
     website_hbox.set_padded(&ui, true);
 
     // Add to the input panel
-    input_vbox.append(&ui, load_file_button.clone(), LayoutStrategy::Compact);
     input_vbox.append(&ui, website_hbox.clone(), LayoutStrategy::Compact);
-    input_vbox.append(&ui, clear_textarea_buton.clone(), LayoutStrategy::Compact);
+    input_vbox.append(&ui, load_file_button.clone(), LayoutStrategy::Compact);
+    input_vbox.append(&ui, clear_textarea_button.clone(), LayoutStrategy::Compact);
     input_vbox.append(&ui, entry.clone(), LayoutStrategy::Stretchy);
     input_vbox.append(&ui, process_button.clone(), LayoutStrategy::Compact);
     input_vbox.set_padded(&ui, true);
@@ -105,7 +105,7 @@ fn main() {
     }
 
     // Color labels
-    let color_label = Label::new(&ui, "RGB: 0, 0, 0 - Hex: #000000");
+    let color_label = Label::new(&ui, "RGB: 0, 0, 0 - HEX: #000000");
     output_vbox.append(&ui, color_label.clone(), LayoutStrategy::Stretchy);
 
     output_vbox.append(&ui, HorizontalSeparator::new(&ui), LayoutStrategy::Stretchy);
@@ -136,7 +136,7 @@ fn main() {
     window.set_child(&ui, horizontal_box);
     window.show(&ui);
 
-    clear_textarea_buton.on_clicked(&ui, {
+    clear_textarea_button.on_clicked(&ui, {
         let ui = ui.clone();
         let mut entry = entry.clone();
         move |_| {
@@ -186,6 +186,12 @@ fn main() {
             let path = path.unwrap();
 
             let document = Document::from_file(&path);
+            if document == None {
+                window.modal_err(&ui, "Warning", "Please enter a valid text document");
+                return;
+            }
+            let document = document.unwrap();
+
             entry.set_value(&ui, &document.content);
             colors.borrow_mut().count_occurences(&document);
 
