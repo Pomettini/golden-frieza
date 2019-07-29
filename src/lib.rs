@@ -184,3 +184,6 @@ pub fn calculate_percentages(
 
     result
 }
+
+#[cfg(test)]
+mod tests;

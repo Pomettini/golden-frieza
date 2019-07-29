@@ -1,4 +1,5 @@
 # golden-frieza
+
 An experimental tool for text classification, still very WIP
 
 [![Build Status](https://travis-ci.org/Pomettini/golden-frieza.svg?branch=master)](https://travis-ci.org/Pomettini/golden-frieza)
