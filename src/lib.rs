@@ -13,9 +13,6 @@ use std::io::prelude::*;
 use std::iter::FromIterator;
 use std::path::Path;
 
-// Build with CXXFLAGS=-stdlib=libc++ cargo run
-// TODO: Find the way to add this to the build script
-
 type RGB = [f32; 3];
 
 #[derive(Default)]
@@ -25,7 +22,7 @@ pub struct DisplayColors {
 
 impl DisplayColors {
     pub fn load_dictionary(path: &Path) -> DisplayColors {
-        let mut reader = Reader::from_path(path).unwrap();
+        let mut reader = Reader::from_path(path).expect("Cannot load Color dictionary");
         let mut dictionary: HashMap<String, RGB> = HashMap::new();
 
         for record in reader.deserialize() {
@@ -66,7 +63,7 @@ pub struct Color {
     pub matches: usize,
 }
 
-#[derive(Default, PartialEq)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Document {
     pub content: String,
 }
@@ -79,8 +76,6 @@ impl Document {
     }
 
     pub fn from_file(path: &Path) -> Option<Document> {
-        // TODO: Handle only text files
-
         let mut file = File::open(&path).expect("File not found");
         let mut contents = String::new();
 
@@ -189,6 +184,3 @@ pub fn calculate_percentages(
 
     result
 }
-
-#[cfg(test)]
-mod tests;

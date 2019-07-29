@@ -248,14 +248,22 @@ fn test_process_file() {
     INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document = Document::from_file(Path::new("resources/test/sample_file.txt"));
-    // TODO: Check if file is valid
-    colors.count_occurences(&document.unwrap());
+    colors.count_occurences(&document.expect("Text file cannot be parsed"));
 
     let mut result: HashMap<String, usize> = HashMap::new();
     result.insert(String::from("Black"), 1);
     result.insert(String::from("White"), 1);
 
     assert_eq!(colors.occurrences, result);
+}
+
+#[test]
+fn test_process_non_text_file() {
+    INIT_COLOR_DICTIONARY!(colors, dictionary);
+
+    let document = Document::from_file(Path::new("resources/test/image_file.png"));
+
+    assert_eq!(document, None);
 }
 
 #[test]

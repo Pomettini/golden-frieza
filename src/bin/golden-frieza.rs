@@ -17,7 +17,6 @@ use std::fs::File;
 use std::path::Path;
 use std::rc::Rc;
 
-// TODO: Load file
 // TODO: Load website
 // TODO: Support multiple languages
 
@@ -76,7 +75,7 @@ fn main() {
     website_hbox.set_padded(&ui, true);
 
     // Add to the input panel
-    input_vbox.append(&ui, website_hbox.clone(), LayoutStrategy::Compact);
+    // input_vbox.append(&ui, website_hbox.clone(), LayoutStrategy::Compact);
     input_vbox.append(&ui, load_file_button.clone(), LayoutStrategy::Compact);
     input_vbox.append(&ui, clear_textarea_button.clone(), LayoutStrategy::Compact);
     input_vbox.append(&ui, entry.clone(), LayoutStrategy::Stretchy);
