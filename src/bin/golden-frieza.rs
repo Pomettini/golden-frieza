@@ -6,15 +6,14 @@ extern crate iui;
 use golden_frieza::*;
 use iui::controls::{
     Area, AreaDrawParams, AreaHandler, Button, Entry, HorizontalBox, HorizontalSeparator, Label,
-    LayoutStrategy, MultilineEntry, ProgressBar, ProgressBarValue, Spacer, VerticalBox,
+    LayoutStrategy, MultilineEntry, ProgressBar, ProgressBarValue, VerticalBox,
 };
 use iui::draw::{Brush, FillMode, SolidBrush};
 use iui::prelude::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::env;
+#[allow(unused_imports)]
 use std::fs::File;
-use std::io::prelude::*;
 use std::path::Path;
 use std::rc::Rc;
 
@@ -64,9 +63,9 @@ fn main() {
 
     // Create the input controls
     let mut input_vbox = VerticalBox::new(&ui);
-    let mut entry = MultilineEntry::new(&ui);
+    let entry = MultilineEntry::new(&ui);
     let mut load_file_button = Button::new(&ui, "Load File");
-    let mut website_entry = Entry::new(&ui);
+    let website_entry = Entry::new(&ui);
     let mut load_website_button = Button::new(&ui, "Load Website");
     let mut clear_textarea_buton = Button::new(&ui, "Clear Text Area");
     let mut process_button = Button::new(&ui, "Process Data");
@@ -92,13 +91,13 @@ fn main() {
 
     // Insert GUI elements in a dictionary where Color is the key
     for key in colors.borrow().dictionary.keys() {
-        let mut label = Label::new(&ui, &format!("{} is 0%", key));
+        let label = Label::new(&ui, &format!("{} is 0%", key));
         text_labels
             .borrow_mut()
             .insert(key.to_string(), label.clone());
         output_vbox.append(&ui, label.clone(), LayoutStrategy::Compact);
 
-        let mut text_bar = ProgressBar::new();
+        let text_bar = ProgressBar::new();
         text_bars
             .borrow_mut()
             .insert(key.to_string(), text_bar.clone());
@@ -106,7 +105,7 @@ fn main() {
     }
 
     // Color labels
-    let mut color_label = Label::new(&ui, "Color: 0 0 0");
+    let color_label = Label::new(&ui, "Color: 0 0 0");
     output_vbox.append(&ui, color_label.clone(), LayoutStrategy::Stretchy);
 
     output_vbox.append(&ui, HorizontalSeparator::new(&ui), LayoutStrategy::Stretchy);
@@ -125,7 +124,7 @@ fn main() {
     // It's a terrible, terrible hack, but it works
     // And it will leak memory :(
 
-    let mut temp_vboxes = Rc::new(RefCell::new(Vec::new()));
+    let temp_vboxes = Rc::new(RefCell::new(Vec::new()));
 
     let mut temp_vbox = VerticalBox::new(&ui);
     temp_vboxes.borrow_mut().push(temp_vbox.clone());
@@ -174,7 +173,7 @@ fn main() {
 
     load_file_button.on_clicked(&ui, {
         let ui = ui.clone();
-        let entry = entry.clone();
+        // let entry = entry.clone();
         let colors = colors.clone();
         move |_| {
             let path = window.open_file(&ui).expect("File not found");
@@ -195,9 +194,9 @@ fn main() {
     });
 
     load_website_button.on_clicked(&ui, {
-        let ui = ui.clone();
+        // let ui = ui.clone();
         move |_| {
-            let document = Document::from_website("http://example.org/");
+            let _document = Document::from_website("http://example.org/");
         }
     });
 
