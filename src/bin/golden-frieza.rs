@@ -50,16 +50,24 @@ fn main() {
     let mut window = Window::new(&ui, "Golden Frieza", 800, 600, WindowType::NoMenubar);
 
     // Initialize color dictionaries
-    let colors: Rc<RefCell<Color>> = Rc::new(RefCell::new(golden_frieza::Color::default()));
+    let colors: Rc<RefCell<Color>> = Rc::new(RefCell::new(Color::default()));
     // TODO: Show an alert if file is not found
     let dictionary_path = Path::new("resources/colors.csv");
-    colors.borrow_mut().load_dictionary(dictionary_path);
+    match colors.borrow_mut().load_dictionary(dictionary_path) {
+        Ok(_) => (),
+        Err(error) => {
+            window.show(&ui);
+            window.modal_err(&ui, "Warning", error);
+            return;
+        }
+    }
 
     let dictionary = match DisplayColors::load_dictionary(Path::new("resources/display_colors.csv"))
     {
-        Ok(dict) => dict,
-        Err(err) => {
-            window.modal_err(&ui, "Warning", err);
+        Ok(dictionary_) => dictionary_,
+        Err(error) => {
+            window.show(&ui);
+            window.modal_err(&ui, "Warning", error);
             return;
         }
     };
@@ -195,9 +203,9 @@ fn main() {
             };
 
             let document = match Document::from_file(&path) {
-                Ok(doc) => doc,
-                Err(err) => {
-                    window.modal_err(&ui, "Warning", err);
+                Ok(document_) => document_,
+                Err(error) => {
+                    window.modal_err(&ui, "Warning", error);
                     return;
                 }
             };

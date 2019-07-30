@@ -23,18 +23,18 @@ pub struct DisplayColors {
 }
 
 impl DisplayColors {
-    pub fn load_dictionary(path: &Path) -> Result<DisplayColors, &str> {
+    pub fn load_dictionary(path: &Path) -> Result<Self, &str> {
         let mut reader = match Reader::from_path(path) {
-            Ok(r) => r,
-            Err(_) => return Err("Cannot find dictionary file"),
+            Ok(reader_) => reader_,
+            Err(_) => return Err("Please enter a valid color dictionary file"),
         };
         let mut dictionary: HashMap<String, RGB> = HashMap::new();
 
         for record in reader.deserialize() {
             // TODO: Refactor, there has to be a better way to write this
             let record: (String, f32, f32, f32) = match record {
-                Ok(r) => r,
-                Err(_) => return Err("Cannot parse the contents of dictionary file"),
+                Ok(record_) => record_,
+                Err(_) => return Err("The dictionary file is not valid"),
             };
             let mut rgb: RGB = [0.0; 3];
             rgb[0] = record.1;
@@ -60,7 +60,7 @@ impl DisplayColors {
 }
 
 pub trait Element {
-    fn load_dictionary(&mut self, path: &Path);
+    fn load_dictionary(&mut self, path: &Path) -> Result<(), &str>;
     fn count_occurences(&mut self, document: &Document);
 }
 
@@ -85,7 +85,7 @@ impl Document {
 
     pub fn from_file(path: &Path) -> Result<Self, &str> {
         let mut file = match File::open(&path) {
-            Ok(f) => f,
+            Ok(file_) => file_,
             Err(_) => return Err("Cannot open the file"),
         };
         let mut contents = String::new();
@@ -133,20 +133,25 @@ impl Document {
 }
 
 impl Element for Color {
-    fn load_dictionary(&mut self, path: &Path) {
-        let mut dictionary = ReaderBuilder::new()
-            .delimiter(b';')
-            .from_path(path)
-            .expect("Cannot build the dictionary");
+    fn load_dictionary(&mut self, path: &Path) -> Result<(), &str> {
+        let mut dictionary = match ReaderBuilder::new().delimiter(b';').from_path(path) {
+            Ok(file) => file,
+            Err(_) => return Err("Cannot read the color file"),
+        };
 
         for result in dictionary.deserialize() {
-            let record: (String, String) = result.expect("Cannot deserialize the dictionary");
+            let record: (String, String) = match result {
+                Ok(record_) => record_,
+                Err(_) => return Err("Cannot deserialize the dictionary"),
+            };
 
             let color = record.0;
             let words: Vec<String> = Vec::from_iter(record.1.split(", ").map(String::from));
 
             self.dictionary.insert(color, words);
         }
+
+        Ok(())
     }
 
     fn count_occurences(&mut self, document: &Document) {

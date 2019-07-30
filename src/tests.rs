@@ -6,7 +6,7 @@ macro_rules! INIT_COLOR_DICTIONARY {
     ($colors:ident, $dictionary:ident) => {
         let mut $colors: Color = Color::default();
         let $dictionary = Path::new("resources/test/colors.csv");
-        $colors.load_dictionary(&$dictionary);
+        $colors.load_dictionary(&$dictionary).unwrap();
     };
 }
 
@@ -36,6 +36,14 @@ fn test_load_dictionary_second() {
     ];
 
     assert_eq!(key, result);
+}
+
+#[test]
+#[should_panic]
+fn test_load_dictionary_file_not_found() {
+    let mut colors: Color = Color::default();
+    let dictionary = Path::new("resources/test/colors_not_found.csv");
+    colors.load_dictionary(dictionary).unwrap();
 }
 
 #[test]
@@ -178,6 +186,13 @@ fn test_load_display_colors() {
     result.insert(String::from("Blue"), [0.0, 0.0, 255.0]);
 
     assert_eq!(display_colors.dictionary, result);
+}
+
+#[test]
+#[should_panic]
+fn test_load_display_colors_file_not_found() {
+    DisplayColors::load_dictionary(Path::new("resources/test/display_colors_not_found.csv"))
+        .unwrap();
 }
 
 #[test]
