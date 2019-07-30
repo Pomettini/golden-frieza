@@ -270,7 +270,10 @@ macro_rules! refresh_content {
             &$ui,
             &format!(
                 "RGB: {:.0}, {:.0}, {:.0} - HEX: {}",
-                color[0], color[1], color[2], hex
+                color[0],
+                color[1],
+                color[2],
+                hex.to_uppercase()
             ),
         );
 
