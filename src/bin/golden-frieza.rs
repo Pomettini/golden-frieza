@@ -39,14 +39,6 @@ impl AreaHandler for HandleCanvas {
 }
 
 fn main() {
-    let colors: Rc<RefCell<Color>> = Rc::new(RefCell::new(Default::default()));
-    let dictionary = Path::new("resources/colors.csv");
-    colors.borrow_mut().load_dictionary(&dictionary);
-
-    let display_colors: Rc<RefCell<DisplayColors>> = Rc::new(RefCell::new(
-        DisplayColors::load_dictionary(Path::new("resources/display_colors.csv")),
-    ));
-
     // Initialize the UI
     let ui = UI::init().expect("Cannot initialize the UI");
 
@@ -54,6 +46,17 @@ fn main() {
 
     // Initialize the window
     let mut window = Window::new(&ui, "Golden Frieza", 800, 600, WindowType::NoMenubar);
+
+    // Initialize color dictionaries
+    let colors: Rc<RefCell<Color>> = Rc::new(RefCell::new(Default::default()));
+    // TODO: Show an alert if file is not found
+    let dictionary = Path::new("resources/colors.csv");
+    colors.borrow_mut().load_dictionary(&dictionary);
+
+    let display_colors: Rc<RefCell<DisplayColors>> = Rc::new(RefCell::new(
+        // TODO: Show an alert if file is not found
+        DisplayColors::load_dictionary(Path::new("resources/display_colors.csv")).unwrap(),
+    ));
 
     // Text labels and bars
     let text_labels: Rc<RefCell<HashMap<String, Label>>> = Rc::new(RefCell::new(HashMap::new()));
@@ -176,20 +179,21 @@ fn main() {
         let mut entry = entry.clone();
         let colors = colors.clone();
         move |_| {
-            let path = window.open_file(&ui);
-            if path == None {
-                window.modal_err(&ui, "Warning", "Please enter a valid file");
-                return;
-            }
+            let path = match window.open_file(&ui) {
+                Some(p) => p,
+                None => {
+                    window.modal_err(&ui, "Warning", "Please enter a valid file");
+                    return;
+                }
+            };
 
-            let path = path.unwrap();
-
-            let document = Document::from_file(&path);
-            if document == None {
-                window.modal_err(&ui, "Warning", "Please enter a valid text document");
-                return;
-            }
-            let document = document.unwrap();
+            let document = match Document::from_file(&path) {
+                Ok(d) => d,
+                Err(_e) => {
+                    window.modal_err(&ui, "Warning", "Please enter a valid text document");
+                    return;
+                }
+            };
 
             entry.set_value(&ui, &document.content);
             colors.borrow_mut().count_occurences(&document);

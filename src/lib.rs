@@ -21,13 +21,19 @@ pub struct DisplayColors {
 }
 
 impl DisplayColors {
-    pub fn load_dictionary(path: &Path) -> DisplayColors {
-        let mut reader = Reader::from_path(path).expect("Cannot load Color dictionary");
+    pub fn load_dictionary(path: &Path) -> Result<DisplayColors, &str> {
+        let mut reader = match Reader::from_path(path) {
+            Ok(r) => r,
+            Err(_) => return Err("Cannot find dictionary file"),
+        };
         let mut dictionary: HashMap<String, RGB> = HashMap::new();
 
         for record in reader.deserialize() {
             // TODO: Refactor, there has to be a better way to write this
-            let record: (String, f32, f32, f32) = record.unwrap();
+            let record: (String, f32, f32, f32) = match record {
+                Ok(r) => r,
+                Err(_) => return Err("Cannot parse the contents of dictionary file"),
+            };
             let mut rgb: RGB = [0.0; 3];
             rgb[0] = record.1;
             rgb[1] = record.2;
@@ -35,7 +41,7 @@ impl DisplayColors {
             dictionary.insert(record.0, rgb);
         }
 
-        DisplayColors { dictionary }
+        Ok(DisplayColors { dictionary })
     }
 
     pub fn blend_colors(&self, dictionary: HashMap<String, f32>) -> RGB {
@@ -75,23 +81,26 @@ impl Document {
         }
     }
 
-    pub fn from_file(path: &Path) -> Option<Document> {
-        let mut file = File::open(&path).expect("File not found");
+    pub fn from_file(path: &Path) -> Result<Document, &str> {
+        let mut file = match File::open(&path) {
+            Ok(f) => f,
+            Err(_) => return Err("Cannot open the file"),
+        };
         let mut contents = String::new();
 
         match file.read_to_string(&mut contents) {
-            Ok(_) => return Some(Document { content: contents }),
-            Err(_) => return None,
+            Ok(_) => Ok(Document { content: contents }),
+            Err(_) => Err("Cannot parse the file"),
         }
     }
 
-    pub fn from_website(url: &str) -> Document {
+    pub fn from_website(url: &str) -> Option<Document> {
         // TODO: Handle errors and exceptions
 
         let mut request = reqwest::get(url).expect("URL not valid");
         let page_content = request.text().expect("Cannot parse page content");
 
-        #[cfg_attr(rustfmt, rustfmt_skip)]
+        #[rustfmt::skip]
         let tags: HashSet<_> = [
             "a", "abbr", "acronym", "area", "article", "aside", "b", "bdi",
             "bdo", "blockquote", "br", "caption", "center", "cite", "code",
@@ -115,9 +124,9 @@ impl Document {
 
         println!("RESULT: {:?}", &clean_text);
 
-        Document {
+        Some(Document {
             content: clean_text,
-        }
+        })
     }
 }
 

@@ -167,7 +167,7 @@ fn test_process_document_calculate_percengages_non_matching_words() {
 #[test]
 fn test_load_display_colors() {
     let display_colors =
-        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv")).unwrap();
 
     let mut result: HashMap<String, RGB> = HashMap::new();
     result.insert(String::from("Black"), [0.0, 0.0, 0.0]);
@@ -181,7 +181,7 @@ fn test_load_display_colors() {
 #[test]
 fn test_load_display_blend_colors_first() {
     let display_colors =
-        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv")).unwrap();
 
     let mut input: HashMap<String, f32> = HashMap::new();
     input.insert(String::from("Black"), 50.0);
@@ -197,7 +197,7 @@ fn test_load_display_blend_colors_first() {
 #[test]
 fn test_load_display_blend_colors_second() {
     let display_colors =
-        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv")).unwrap();
 
     let mut input: HashMap<String, f32> = HashMap::new();
     input.insert(String::from("Black"), 25.0);
@@ -213,7 +213,7 @@ fn test_load_display_blend_colors_second() {
 #[test]
 fn test_load_display_blend_colors_third() {
     let display_colors =
-        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv")).unwrap();
 
     let mut input: HashMap<String, f32> = HashMap::new();
     input.insert(String::from("White"), 25.0);
@@ -229,7 +229,7 @@ fn test_load_display_blend_colors_third() {
 #[test]
 fn test_load_display_blend_colors_fourth() {
     let display_colors =
-        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv"));
+        DisplayColors::load_dictionary(Path::new("resources/test/display_colors.csv")).unwrap();
 
     let mut input: HashMap<String, f32> = HashMap::new();
     input.insert(String::from("White"), 25.0);
@@ -263,7 +263,7 @@ fn test_process_non_text_file() {
 
     let document = Document::from_file(Path::new("resources/test/image_file.png"));
 
-    assert_eq!(document, None);
+    assert_eq!(document, Err("Cannot parse the file"));
 }
 
 #[test]
@@ -271,7 +271,7 @@ fn test_process_website() {
     INIT_COLOR_DICTIONARY!(colors, dictionary);
 
     let document =
-        Document::from_website("https://www.giorgiopomettini.eu/test/sample_webpage.html");
+        Document::from_website("https://www.giorgiopomettini.eu/test/sample_webpage.html").unwrap();
     colors.count_occurences(&document);
 
     let mut result: HashMap<String, usize> = HashMap::new();
