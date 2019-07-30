@@ -1,3 +1,5 @@
+#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
+
 extern crate ammonia;
 extern crate csv;
 extern crate regex;
@@ -41,7 +43,7 @@ impl DisplayColors {
             dictionary.insert(record.0, rgb);
         }
 
-        Ok(DisplayColors { dictionary })
+        Ok(Self { dictionary })
     }
 
     pub fn blend_colors(&self, dictionary: HashMap<String, f32>) -> RGB {
@@ -75,13 +77,13 @@ pub struct Document {
 }
 
 impl Document {
-    pub fn from_text(text: &String) -> Document {
-        Document {
+    pub fn from_text(text: &str) -> Self {
+        Self {
             content: text.to_string(),
         }
     }
 
-    pub fn from_file(path: &Path) -> Result<Document, &str> {
+    pub fn from_file(path: &Path) -> Result<Self, &str> {
         let mut file = match File::open(&path) {
             Ok(f) => f,
             Err(_) => return Err("Cannot open the file"),
@@ -89,12 +91,12 @@ impl Document {
         let mut contents = String::new();
 
         match file.read_to_string(&mut contents) {
-            Ok(_) => Ok(Document { content: contents }),
+            Ok(_) => Ok(Self { content: contents }),
             Err(_) => Err("Cannot parse the file"),
         }
     }
 
-    pub fn from_website(url: &str) -> Option<Document> {
+    pub fn from_website(url: &str) -> Option<Self> {
         // TODO: Handle errors and exceptions
 
         let mut request = reqwest::get(url).expect("URL not valid");
@@ -124,7 +126,7 @@ impl Document {
 
         println!("RESULT: {:?}", &clean_text);
 
-        Some(Document {
+        Some(Self {
             content: clean_text,
         })
     }

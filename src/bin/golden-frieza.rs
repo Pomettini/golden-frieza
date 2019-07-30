@@ -1,3 +1,5 @@
+#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
+
 extern crate color_convert;
 extern crate csv;
 extern crate golden_frieza;
@@ -48,15 +50,21 @@ fn main() {
     let mut window = Window::new(&ui, "Golden Frieza", 800, 600, WindowType::NoMenubar);
 
     // Initialize color dictionaries
-    let colors: Rc<RefCell<Color>> = Rc::new(RefCell::new(Default::default()));
+    let colors: Rc<RefCell<Color>> = Rc::new(RefCell::new(golden_frieza::Color::default()));
     // TODO: Show an alert if file is not found
-    let dictionary = Path::new("resources/colors.csv");
-    colors.borrow_mut().load_dictionary(&dictionary);
+    let dictionary_path = Path::new("resources/colors.csv");
+    colors.borrow_mut().load_dictionary(dictionary_path);
 
-    let display_colors: Rc<RefCell<DisplayColors>> = Rc::new(RefCell::new(
-        // TODO: Show an alert if file is not found
-        DisplayColors::load_dictionary(Path::new("resources/display_colors.csv")).unwrap(),
-    ));
+    let dictionary = match DisplayColors::load_dictionary(Path::new("resources/display_colors.csv"))
+    {
+        Ok(dict) => dict,
+        Err(err) => {
+            window.modal_err(&ui, "Warning", err);
+            return;
+        }
+    };
+
+    let display_colors: Rc<RefCell<DisplayColors>> = Rc::new(RefCell::new(dictionary));
 
     // Text labels and bars
     let text_labels: Rc<RefCell<HashMap<String, Label>>> = Rc::new(RefCell::new(HashMap::new()));
@@ -73,7 +81,7 @@ fn main() {
     let mut process_button = Button::new(&ui, "Process Data");
 
     let mut website_hbox = HorizontalBox::new(&ui);
-    website_hbox.append(&ui, website_entry.clone(), LayoutStrategy::Stretchy);
+    website_hbox.append(&ui, website_entry, LayoutStrategy::Stretchy);
     website_hbox.append(&ui, load_website_button.clone(), LayoutStrategy::Compact);
     website_hbox.set_padded(&ui, true);
 
@@ -133,7 +141,7 @@ fn main() {
 
     let color_area = Area::new(&ui, Box::new(color_canvas));
     temp_vbox.append(&ui, color_area, LayoutStrategy::Compact);
-    output_vbox.append(&ui, temp_vbox.clone(), LayoutStrategy::Compact);
+    output_vbox.append(&ui, temp_vbox, LayoutStrategy::Compact);
 
     window.set_child(&ui, horizontal_box);
     window.show(&ui);
@@ -175,22 +183,21 @@ fn main() {
 
     load_file_button.on_clicked(&ui, {
         let ui = ui.clone();
-        let window = window.clone();
-        let mut entry = entry.clone();
-        let colors = colors.clone();
+        let window = window;
+        let mut entry = entry;
+        let colors = colors;
         move |_| {
-            let path = match window.open_file(&ui) {
-                Some(p) => p,
-                None => {
-                    window.modal_err(&ui, "Warning", "Please enter a valid file");
-                    return;
-                }
+            let path = if let Some(path_) = window.open_file(&ui) {
+                path_
+            } else {
+                window.modal_err(&ui, "Warning", "Please enter a valid file");
+                return;
             };
 
             let document = match Document::from_file(&path) {
-                Ok(d) => d,
-                Err(_e) => {
-                    window.modal_err(&ui, "Warning", "Please enter a valid text document");
+                Ok(doc) => doc,
+                Err(err) => {
+                    window.modal_err(&ui, "Warning", err);
                     return;
                 }
             };

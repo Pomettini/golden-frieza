@@ -1,8 +1,10 @@
+#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
+
 use super::*;
 
 macro_rules! INIT_COLOR_DICTIONARY {
     ($colors:ident, $dictionary:ident) => {
-        let mut $colors: Color = Default::default();
+        let mut $colors: Color = Color::default();
         let $dictionary = Path::new("resources/test/colors.csv");
         $colors.load_dictionary(&$dictionary);
     };
